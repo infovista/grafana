@@ -51,8 +51,8 @@ export class TemplateSrv {
     if (this.timeRange) {
       const from = this.timeRange.from.valueOf().toString();
       const to = this.timeRange.to.valueOf().toString();
-      const fromTxt = this.timeRange.from.format(TIME_FORMAT);
-      const toTxt = this.timeRange.to.format(TIME_FORMAT);
+      const fromTxt = this.timeRange.from.local().format(TIME_FORMAT);
+      const toTxt = this.timeRange.to.local().format(TIME_FORMAT);
 
       this.index = {
         ...this.index,
