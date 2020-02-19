@@ -55,29 +55,13 @@ export class VariableSrv {
       )
       .then(() => {
         this.templateSrv.updateIndex();
-        this.templateSrv.setGlobalVariable('__dashboard', {
-          value: {
-            name: dashboard.title,
-            uid: dashboard.uid,
-            toString: function() {
-              return this.uid;
-            },
-          },
-        });
-        this.templateSrv.setGlobalVariable('__org', {
-          value: {
-            name: contextSrv.user.orgName,
-            id: contextSrv.user.id,
-            toString: function() {
-              return this.id;
-            },
-          },
-        });
+        this.setGlobalVariables();
       });
   }
 
   onTimeRangeUpdated(timeRange: TimeRange) {
     this.templateSrv.updateTimeRange(timeRange);
+    this.setGlobalVariables();
     const promises = this.variables
       .filter(variable => variable.refresh === 2)
       .map(variable => {
@@ -98,6 +82,27 @@ export class VariableSrv {
       .catch(e => {
         appEvents.emit(AppEvents.alertError, ['Template variable service failed', e.message]);
       });
+  }
+
+  setGlobalVariables() {
+    this.templateSrv.setGlobalVariable('__dashboard', {
+      value: {
+        name: this.dashboard.title,
+        uid: this.dashboard.uid,
+        toString: function() {
+          return this.uid;
+        },
+      },
+    });
+    this.templateSrv.setGlobalVariable('__org', {
+      value: {
+        name: contextSrv.user.orgName,
+        id: contextSrv.user.id,
+        toString: function() {
+          return this.id;
+        },
+      },
+    });
   }
 
   processVariable(variable: any, queryParams: any) {
