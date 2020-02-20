@@ -13,6 +13,7 @@ import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
 // Types
 import { TimeRange } from '@grafana/data';
 import { CoreEvents } from 'app/types';
+import { contextSrv } from 'app/core/core';
 
 export class VariableSrv {
   dashboard: DashboardModel;
@@ -53,11 +54,13 @@ export class VariableSrv {
       )
       .then(() => {
         this.templateSrv.updateIndex();
+        this.setGlobalVariables();
       });
   }
 
   onTimeRangeUpdated(timeRange: TimeRange) {
     this.templateSrv.updateTimeRange(timeRange);
+    this.setGlobalVariables();
     const promises = this.variables
       .filter(variable => variable.refresh === 2)
       .map(variable => {
@@ -72,6 +75,27 @@ export class VariableSrv {
 
     return this.$q.all(promises).then(() => {
       this.dashboard.startRefresh();
+    });
+  }
+
+  setGlobalVariables() {
+    this.templateSrv.setGlobalVariable('__dashboard', {
+      value: {
+        name: this.dashboard.title,
+        uid: this.dashboard.uid,
+        toString: function() {
+          return this.uid;
+        },
+      },
+    });
+    this.templateSrv.setGlobalVariable('__org', {
+      value: {
+        name: contextSrv.user.orgName,
+        id: contextSrv.user.id,
+        toString: function() {
+          return this.id;
+        },
+      },
     });
   }
 
