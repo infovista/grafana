@@ -57,16 +57,26 @@ export class TemplateSrv {
       this.index = {
         ...this.index,
         ['__from']: {
-          current: { value: from, text: from },
+          current: {
+            value: {
+              value: from,
+              text: fromTxt,
+              toString: function() {
+                return this.value;
+              },
+            },
+          },
         },
         ['__to']: {
-          current: { value: to, text: to },
-        },
-        ['__from_text']: {
-          current: { value: fromTxt, text: fromTxt },
-        },
-        ['__to_text']: {
-          current: { value: toTxt, text: toTxt },
+          current: {
+            value: {
+              value: to,
+              text: toTxt,
+              toString: function() {
+                return this.value;
+              },
+            },
+          },
         },
       };
     }
@@ -309,6 +319,15 @@ export class TemplateSrv {
         // skip formatting of custom all values
         if (variable.allValue) {
           return this.replace(value);
+        }
+      }
+
+      if (fieldPath) {
+        const fieldValue = this.getVariableValue(variableName, fieldPath, {
+          [variableName]: { value: value, text: '' },
+        });
+        if (fieldValue !== null && fieldValue !== undefined) {
+          return this.formatValue(fieldValue, fmt, variable);
         }
       }
 
