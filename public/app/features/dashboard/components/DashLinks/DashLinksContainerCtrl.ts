@@ -1,5 +1,6 @@
-import angular, { IQService } from 'angular';
+import angular, { IQService, ILocationService } from 'angular';
 import _ from 'lodash';
+import config from 'app/core/config';
 import { iconMap } from './DashLinksEditorCtrl';
 import { LinkSrv } from 'app/features/panel/panellinks/link_srv';
 import { BackendSrv } from 'app/core/services/backend_srv';
@@ -7,6 +8,7 @@ import { DashboardSrv } from '../../services/DashboardSrv';
 import { PanelEvents } from '@grafana/data';
 import { CoreEvents } from 'app/types';
 import { GrafanaRootScope } from 'app/routes/GrafanaCtrl';
+import { toUrlParams } from '../../../../core/utils/url';
 
 export type DashboardLink = { tags: any; target: string; keepTime: any; includeVars: any };
 
@@ -97,6 +99,7 @@ export class DashLinksContainerCtrl {
   constructor(
     $scope: any,
     $rootScope: GrafanaRootScope,
+    $location: ILocationService,
     $q: IQService,
     backendSrv: BackendSrv,
     dashboardSrv: DashboardSrv,
@@ -132,6 +135,28 @@ export class DashLinksContainerCtrl {
         return $q.when([
           {
             url: linkDef.url,
+            title: linkDef.title,
+            // @ts-ignore
+            icon: iconMap[linkDef.icon],
+            tooltip: linkDef.tooltip,
+            target: linkDef.targetBlank ? '_blank' : '_self',
+            keepTime: linkDef.keepTime,
+            includeVars: linkDef.includeVars,
+          },
+        ]);
+      }
+
+      if (linkDef.type === 'rendering') {
+        const urlParams = {
+          encoding: linkDef.encoding ? linkDef.encoding : 'png',
+          width: linkDef.width ? linkDef.width : 1000,
+          height: linkDef.height ? linkDef.height : 500,
+        };
+
+        return $q.when([
+          {
+            url: config.appSubUrl + '/render' + $location.path() + '?' + toUrlParams(urlParams),
+            urlParams: linkDef.urlParams,
             title: linkDef.title,
             // @ts-ignore
             icon: iconMap[linkDef.icon],
