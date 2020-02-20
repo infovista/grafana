@@ -49,6 +49,7 @@ func (rs *RenderingService) renderViaHttp(ctx context.Context, opts Opts) (*Rend
 	queryParams.Add("timezone", isoTimeOffsetToPosixTz(opts.Timezone))
 	queryParams.Add("encoding", opts.Encoding)
 	queryParams.Add("timeout", strconv.Itoa(int(opts.Timeout.Seconds())))
+	queryParams.Add("jsonData", opts.JsonData)
 	rendererUrl.RawQuery = queryParams.Encode()
 
 	req, err := http.NewRequest("GET", rendererUrl.String(), nil)
@@ -99,5 +100,5 @@ func (rs *RenderingService) renderViaHttp(ctx context.Context, opts Opts) (*Rend
 		return nil, fmt.Errorf("Remote rendering request failed.  %s", err)
 	}
 
-	return &RenderResult{FilePath: filePath}, err
+	return &RenderResult{FilePath: filePath, ContentType: resp.Header.Get("Content-Type")}, err
 }
