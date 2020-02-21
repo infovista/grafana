@@ -1,3 +1,5 @@
+import {dateTime} from "./moment_wrapper";
+
 // List taken from https://stackoverflow.com/questions/38399465/how-to-get-list-of-all-timezones-in-javascript
 
 export const getTimeZoneGroups = () => {
@@ -388,3 +390,24 @@ export const getTimeZoneGroups = () => {
     { label: 'Pacific', options: pacificZones },
   ];
 };
+
+export function getLocalTimeZone(): string {
+  const utcOffset = 'UTC' + dateTime().format('Z');
+
+  // Older browser does not the internationalization API
+  if (!(window as any).Intl) {
+    return utcOffset;
+  }
+
+  const dateFormat = (window as any).Intl.DateTimeFormat();
+  if (!dateFormat.resolvedOptions) {
+    return utcOffset;
+  }
+
+  const options = dateFormat.resolvedOptions();
+  if (!options.timeZone) {
+    return utcOffset;
+  }
+
+  return options.timeZone;
+}

@@ -9,6 +9,7 @@ import { PanelEvents } from '@grafana/data';
 import { CoreEvents } from 'app/types';
 import { GrafanaRootScope } from 'app/routes/GrafanaCtrl';
 import { toUrlParams } from '../../../../core/utils/url';
+import {getLocalTimeZone} from "@grafana/data";
 
 export type DashboardLink = { tags: any; target: string; keepTime: any; includeVars: any };
 
@@ -151,6 +152,7 @@ export class DashLinksContainerCtrl {
           encoding: linkDef.encoding ? linkDef.encoding : 'png',
           width: linkDef.width ? linkDef.width : 1000,
           height: linkDef.height ? linkDef.height : 500,
+          tz: getLocalTimeZone(),
         };
 
         return $q.when([
